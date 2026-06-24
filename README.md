@@ -1,5 +1,3 @@
-
-
 # Home Lab: Active Directory + osTicket Help Desk Simulation
 
 ## Overview
@@ -16,38 +14,55 @@ Built a virtualized IT environment simulating a small business network. The lab 
 - osTicket v1.18.1
 - Oracle VirtualBox
 
-## Network Architecture
-- Domain: mydomain.com
-- DC/DNS/DHCP Server: Windows Server 2019
-- Client Machine: Windows 10 joined to mydomain.com
-- Web/Ticket Server: Ubuntu Server running osTicket
+## Environment Setup
+Three VMs running in VirtualBox: a Windows Server 2019 domain controller, a Windows 10 client, and an Ubuntu Server hosting osTicket. Port forwarding rules configured on the Ubuntu VM to allow SSH (port 2222) and HTTP (port 8080) access from the host machine.
+
+![VM Setup](vm-setup.png)
+![Port Forwarding Rules](portforwarding.png)
 
 ## Active Directory Configuration
-- Created OUs: _USERS, _ADMINS, _IT, _HR, _COMPUTERS
-- Created Security Groups: IT-Support, HR-Staff
+- Domain: mydomain.com
+- OUs: _USERS, ADMINS, _COMPUTERS, _HR, _IT
+- Security Groups: IT-Support, HR-Staff
 - Created domain users: jsmith (IT-Support), sjones (HR-Staff)
-- Applied GPO (IT-Password-Policy) to _IT OU enforcing 12 character minimum password length, complexity requirements, and 90 day expiration
+
+![AD OU Structure](ad-users.png)
+![IT OU - IT-Support Group and John Smith](it-support.png)
+![HR OU - HR-Staff Group and Sara Jones](hr-security-group.png)
+![Sara Jones - Member Of HR-Staff](sjones-user-properties.png)
+
+### Creating a Domain User
+![New User - Name Entry](create-ad-user-name.png)
+![New User - Password Setup](create-ad-user-pass.png)
+![New User - Finish](create-ad-user-finish.png)
+
+### Password Reset in Active Directory
+Simulated a help desk ticket where a user was locked out. Reset performed directly in AD Users and Computers.
+
+![AD Password Reset](ad-pass-reset.png)
+
+## Group Policy Configuration
+Created and linked a GPO (IT-Password-Policy) to the _IT OU enforcing a 12 character minimum password length, complexity requirements, and 90 day maximum password age.
+
+![GPO Password Policy Settings](gpo.png)
 
 ## osTicket Setup
-- Deployed osTicket on Ubuntu Server via LAMP stack
-- Configured MySQL database for osTicket
-- Created agent accounts to simulate help desk staff
-- Created departments: IT Support
-- Simulated end to end ticket workflow
+Deployed osTicket on Ubuntu Server via LAMP stack. Configured MySQL database, created agent accounts, and set up departments to simulate a real help desk environment.
+
+### Agents
+![Agents Page](agents-page.png)
+
+### Departments
+![Departments Page](departments-page.png)
 
 ## Ticket Workflow
-1. End user submits ticket through client portal reporting inability to log into domain account
-2. Agent receives ticket in SCP dashboard and assigns priority
-3. Agent adds internal note documenting troubleshooting steps
-4. Agent resets user password in Active Directory
-5. Ticket closed with resolution summary sent to user
 
-## Skills Demonstrated
-- Active Directory user and group management
-- Organizational Unit design
-- Group Policy creation and linking
-- Linux server administration
-- LAMP stack deployment
-- Help desk ticketing workflow
-- VirtualBox network configuration
-- SSH remote access
+### Step 1 - User Submits a Ticket
+End user submits a ticket reporting they cannot log into their account or need a password reset.
+
+![New Ticket Form](new-ticket-form.png)
+
+### Step 2 - Agent Views the Queue
+Agent logs into the SCP dashboard and sees all open tickets with priority and assignment status.
+
+![Admin Ticket Queue](admin-tickets.png)
